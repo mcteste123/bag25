@@ -6,6 +6,7 @@ import EditProduct from './pages/EditProduct';
 import EditCategory from './pages/EditCategory';
 import ListProducts from './pages/ListProducts';
 import ListCategories from './pages/ListCategories';
+import AnaliseIA from './pages/AnaliseIA'
 
 export default function Routes() {
   return (
@@ -16,6 +17,7 @@ export default function Routes() {
       <Route path="/editproduct/:id" component={EditProduct} />
       <Route path="/editcategory/:id" component={EditCategory} />
       <Route path="/products" component={ListProducts} />
+      <Route path="/ia" component={AnaliseIA} />
       <Route path="/categories" component={ListCategories} />
     </Switch>
   );

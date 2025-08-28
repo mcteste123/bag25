@@ -1,5 +1,6 @@
 const ProductsRepository = require('../repositories/ProductsRepository');
 const isValidUUID = require('../utils/isValidUUID');
+const { ClienteGemini } = require('../../client');
 
 class ProductController {
   async index(request, response) {
@@ -8,6 +9,43 @@ class ProductController {
     const products = await ProductsRepository.findAll(orderBy);
 
     response.json(products);
+  }
+
+  async ia(req, res) {
+    try {
+      const { prompt } = req.body;
+
+      // 1. Buscar dados do banco
+      const produtos = await ProductsRepository.findAll();
+
+      // 2. Transformar os dados em texto amigável para a IA
+      const dadosEstoque = produtos.map(p =>
+        `Produto: ${p.name} | Categoria: ${p.category_id} | Quantidade: ${p.quantidade_itens}`
+      ).join('\n');
+
+      // 3. Criar o contexto que a IA vai receber
+      const contexto = `
+        Você é um analista de estoque especializado.
+        Analise os dados abaixo e responda à pergunta do usuário.
+        Responda sempre em português, de forma clara e objetiva.
+
+        Dados de estoque:
+        ${dadosEstoque}
+
+        Pergunta do usuário:
+        ${prompt}
+        `;
+
+      // 4. Chamar o Gemini com o contexto
+      const resposta = await ClienteGemini(contexto);
+
+      // 5. Retornar a resposta para o front
+      res.json({ resposta });
+
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ erro: 'Erro ao gerar resposta da IA' });
+    }
   }
 
   async biggest(request, response) {

@@ -14,6 +14,8 @@ router.get(
   ProductController.index,
 );
 
+router.post('/ia', ProductController.ia);
+
 router.get('/biggestproduct', ProductController.biggest);
 router.get('/smallestproduct', ProductController.smallest);
 router.post('/newproduct', ProductController.store);

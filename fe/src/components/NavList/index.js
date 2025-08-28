@@ -23,6 +23,11 @@ export default function NavList() {
           <div className='line' />
         </Link>
 
+        <Link to="/ia">
+            <li>Inteligência Artificial</li>
+            <div className='line' />
+        </Link>
+
         <div className='FooterNav'>
           <Link to="/products">
             <li>Produtos</li>
