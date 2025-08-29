@@ -106,6 +106,7 @@ export const Card = styled.div`
           display: -webkit-box;
           text-overflow: ellipsis;
           overflow: hidden;
+          font-size: 9px;
 
           @media screen and (max-width: 750px) {
             font-size: 70%;

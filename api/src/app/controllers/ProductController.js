@@ -1,13 +1,12 @@
 const ProductsRepository = require('../repositories/ProductsRepository');
+const SalesHistoryRepository = require('../repositories/SalesHistoryRepository');
 const isValidUUID = require('../utils/isValidUUID');
 const { ClienteGemini } = require('../../client');
 
 class ProductController {
   async index(request, response) {
     const { orderBy } = request.query;
-
     const products = await ProductsRepository.findAll(orderBy);
-
     response.json(products);
   }
 
@@ -15,31 +14,36 @@ class ProductController {
     try {
       const { prompt } = req.body;
 
-      // 1. Buscar dados do banco
+      // Estoque atual
       const produtos = await ProductsRepository.findAll();
-
-      // 2. Transformar os dados em texto amigável para a IA
       const dadosEstoque = produtos.map(p =>
         `Produto: ${p.name} | Categoria: ${p.category_id} | Quantidade: ${p.quantidade_itens}`
       ).join('\n');
 
-      // 3. Criar o contexto que a IA vai receber
+      // Histórico de vendas
+      const historico = await SalesHistoryRepository.findAll();
+      const dadosHistorico = historico.map(h =>
+        `${h.sale_date.toISOString().split('T')[0]} - ${h.product_name}: ${h.quantity_sold} unidades`
+      ).join('\n');
+
+
+      // Contexto final para IA
       const contexto = `
-        Você é um analista de estoque especializado.
-        Analise os dados abaixo e responda à pergunta do usuário.
+        Você é um analista de estoque e vendas.
+        Aqui estão os dados do estoque atual e histórico de vendas.
         Responda sempre em português, de forma clara e objetiva.
 
-        Dados de estoque:
+        Estoque atual:
         ${dadosEstoque}
+
+        Histórico de vendas:
+        ${dadosHistorico}
 
         Pergunta do usuário:
         ${prompt}
-        `;
+      `;
 
-      // 4. Chamar o Gemini com o contexto
       const resposta = await ClienteGemini(contexto);
-
-      // 5. Retornar a resposta para o front
       res.json({ resposta });
 
     } catch (error) {
